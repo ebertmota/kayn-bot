@@ -1,7 +1,8 @@
 import './config/module-alias';
 import 'reflect-metadata';
-import { app } from './config';
+import { app } from './config/app';
+import { env } from './config/env';
 
-app.listen(process.env.APP_PORT, () => {
+app.listen(env.port, () => {
   console.log(`\nServer started on port ${process.env.APP_PORT}!`);
 });
