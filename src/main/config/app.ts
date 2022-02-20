@@ -1,7 +1,10 @@
 import 'reflect-metadata';
 import 'dotenv/config';
 import express from 'express';
+import { setupRoutes } from './routes';
+import { setupMiddlewares } from './middlewares';
 
 export const app = express();
 
-app.use(express.json());
+setupRoutes(app);
+setupMiddlewares(app);
