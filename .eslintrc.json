@@ -17,6 +17,11 @@
       "prettier"
     ],
     "rules": {
+      "no-useless-constructor": "off",
+      "no-shadow": "off",
+      "no-redeclare": "off",
+      "@typescript-eslint/no-namespace": "off",
+      "@typescript-eslint/no-shadow": "error",
       "prettier/prettier": "error",
       "no-use-before-define": "off",
       "@typescript-eslint/no-use-before-define": [

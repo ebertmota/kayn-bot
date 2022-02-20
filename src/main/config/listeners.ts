@@ -6,7 +6,11 @@ import { env } from './env';
 
 export const setupListeners = (): void => {
   const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+    intents: [
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.GuildVoiceStates,
+    ],
   });
   client.login(env.discord.token);
 
