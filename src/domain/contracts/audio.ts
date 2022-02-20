@@ -23,6 +23,6 @@ export interface Play {
   play(input: Play.Input): Promise<void>;
 }
 
-export interface Stop {
-  stop(): Promise<void>;
+export interface Leave {
+  leave(): Promise<void>;
 }

@@ -6,9 +6,9 @@ import {
 } from '@discordjs/voice';
 import ytdl from 'ytdl-core';
 
-import { JoinChannel, Play, Stop } from '@/domain/contracts';
+import { JoinChannel, Play, Leave } from '@/domain/contracts';
 
-export class AudioHandler implements JoinChannel, Play, Stop {
+export class AudioHandler implements JoinChannel, Play, Leave {
   private static instance?: AudioHandler;
   private connection: VoiceConnection | null;
 
@@ -59,7 +59,7 @@ export class AudioHandler implements JoinChannel, Play, Stop {
     this.connection?.subscribe(player);
   }
 
-  async stop(): Promise<void> {
+  async leave(): Promise<void> {
     if (this.connection) {
       this.connection.disconnect();
     }

@@ -3,13 +3,11 @@ import { Client } from 'discord.js';
 import {
   makePlayMusicController,
   makeShowFeaturesController,
-  makeStopMusicController,
+  makeLeaveVoiceChannelController,
 } from '../factories';
 
 export default (client: Client): void => {
   const botPrefix = 'k.';
-  const playMusicController = makePlayMusicController();
-  const stopMusicController = makeStopMusicController();
 
   client.on('ready', () => {
     console.log('Connected to discord with success');
@@ -32,13 +30,13 @@ export default (client: Client): void => {
         break;
 
       case 'play':
-        playMusicController.handle({
+        makePlayMusicController().handle({
           audioUrl: commandValue,
           message,
         });
         break;
-      case 'stop':
-        stopMusicController.handle();
+      case 'leave':
+        makeLeaveVoiceChannelController().handle();
         break;
       default:
         message.reply(
