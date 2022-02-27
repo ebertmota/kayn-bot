@@ -65,8 +65,6 @@ export class PlayMusicController implements Controller {
       type: urlType,
     });
 
-    const songsInQueue = this.audio.listQueueSongs();
-
-    message.reply(`music added to queue \n ${songsInQueue}`);
+    message.reply(`music added to queue`);
   }
 }

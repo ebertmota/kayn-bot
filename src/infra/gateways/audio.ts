@@ -100,6 +100,7 @@ export class AudioHandler implements AudioHandlerMethods {
   }
 
   listQueueSongs(): string {
+    console.log('ei', this.queue);
     return this.queue.toString();
   }
 
