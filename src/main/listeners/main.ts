@@ -1,10 +1,7 @@
 /* eslint-disable no-case-declarations */
 import { Client } from 'discord.js';
-import {
-  makePlayMusicController,
-  makeShowFeaturesController,
-  makeLeaveVoiceChannelController,
-} from '../factories';
+import { makeShowFeaturesController } from '../factories';
+import { musicListeners } from './music';
 
 export default (client: Client): void => {
   const botPrefix = 'k.';
@@ -23,26 +20,16 @@ export default (client: Client): void => {
     const [commandKey, commandValue] = data.split(' ');
     const command = commandKey.trim();
 
-    switch (command) {
-      case 'help':
-        const featuresList = await makeShowFeaturesController().handle();
-        message.reply(featuresList);
-        break;
+    musicListeners({
+      client,
+      command,
+      commandValue,
+      message,
+    });
 
-      case 'play':
-        makePlayMusicController().handle({
-          audioUrl: commandValue,
-          message,
-        });
-        break;
-      case 'leave':
-        makeLeaveVoiceChannelController().handle();
-        break;
-      default:
-        message.reply(
-          `Comando não encontrado use **${botPrefix}help** para ver a lista de comandos disponíveis`,
-        );
-        break;
+    if (command === 'help') {
+      const featuresList = makeShowFeaturesController().handle();
+      message.reply(featuresList);
     }
   });
 };

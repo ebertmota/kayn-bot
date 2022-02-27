@@ -8,7 +8,7 @@ export const setupListFeatures: Setup = () => () => {
   return [
     {
       category: '🎵  Music',
-      commands: ['play', 'leave'],
+      commands: ['play', 'pause', 'resume', 'stop', 'next', 'leave'],
     },
   ];
 };

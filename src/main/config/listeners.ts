@@ -1,8 +1,7 @@
 import { GatewayIntentBits } from 'discord-api-types/v9';
 import { Client } from 'discord.js';
-import { readdirSync } from 'fs';
-import { join } from 'path';
 import { env } from './env';
+import registerListeners from '../listeners/main';
 
 export const setupListeners = (): void => {
   const client = new Client({
@@ -14,9 +13,5 @@ export const setupListeners = (): void => {
   });
   client.login(env.discord.token);
 
-  readdirSync(join(__dirname, '../listeners'))
-    .filter(file => !file.endsWith('.map'))
-    .map(async file => {
-      (await import(`../listeners/${file}`)).default(client);
-    });
+  registerListeners(client);
 };

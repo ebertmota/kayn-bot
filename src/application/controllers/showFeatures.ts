@@ -6,7 +6,7 @@ type Output = string;
 export class ShowFeaturesController implements Controller {
   constructor(private readonly listFeatures: ListFeatures) {}
 
-  async handle(): Promise<Output> {
+  handle(): Output {
     const features = this.listFeatures();
 
     const featuresListMessage = features.map(feature => {

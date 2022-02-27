@@ -8,21 +8,44 @@ export namespace JoinChannel {
 }
 
 export interface JoinChannel {
-  join(params: JoinChannel.Input): Promise<void>;
+  join(params: JoinChannel.Input): void;
 }
+
+export type SourceType = 'youtube' | 'spotify';
 
 export namespace Play {
   export type Input = {
-    audioUrl: string;
+    source: string;
+    type: SourceType;
     channelId: string;
     guild: Guild;
   };
 }
 
 export interface Play {
-  play(input: Play.Input): Promise<void>;
+  play(input: Play.Input): void;
+}
+
+export interface ListQueueSongs {
+  listQueueSongs(): string;
 }
 
 export interface Leave {
-  leave(): Promise<void>;
+  leave(): void;
+}
+
+export interface Pause {
+  pause(): void;
+}
+
+export interface Resume {
+  resume(): void;
+}
+
+export interface Stop {
+  stop(): void;
+}
+
+export interface Next {
+  next(): void;
 }

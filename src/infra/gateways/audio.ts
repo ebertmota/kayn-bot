@@ -1,4 +1,5 @@
 import {
+  AudioPlayer,
   createAudioPlayer,
   createAudioResource,
   joinVoiceChannel,
@@ -6,14 +7,45 @@ import {
 } from '@discordjs/voice';
 import ytdl from 'ytdl-core';
 
-import { JoinChannel, Play, Leave } from '@/domain/contracts';
+import {
+  JoinChannel,
+  Play,
+  Leave,
+  Pause,
+  Resume,
+  Stop,
+  Next,
+  ListQueueSongs,
+} from '@/domain/contracts';
 
-export class AudioHandler implements JoinChannel, Play, Leave {
+type AudioHandlerMethods = JoinChannel &
+  Play &
+  Leave &
+  Pause &
+  Resume &
+  Stop &
+  Next &
+  ListQueueSongs;
+
+export class AudioHandler implements AudioHandlerMethods {
   private static instance?: AudioHandler;
   private connection: VoiceConnection | null;
+  private player: AudioPlayer;
+  private queue: string[] = [];
 
   constructor() {
     this.connection = null;
+    this.player = createAudioPlayer({
+      debug: true,
+    });
+
+    this.player.addListener('stateChange', (oldState, newState) => {
+      if (oldState.status === 'playing' && newState.status === 'idle') {
+        if (this.queue.length) {
+          this.playMusic(this.queue[0]);
+        }
+      }
+    });
   }
 
   static getInstance(): AudioHandler {
@@ -24,7 +56,7 @@ export class AudioHandler implements JoinChannel, Play, Leave {
     return AudioHandler.instance;
   }
 
-  async join({ channelId, guild }: JoinChannel.Input) {
+  join({ channelId, guild }: JoinChannel.Input) {
     const canProceedWithConnection = guild;
 
     if (canProceedWithConnection) {
@@ -33,35 +65,66 @@ export class AudioHandler implements JoinChannel, Play, Leave {
         guildId: guild.id,
         adapterCreator: guild.voiceAdapterCreator,
       });
+      this.connection.subscribe(this.player);
     } else {
       throw new Error('Channel connection fails');
     }
   }
 
-  async play({ audioUrl, channelId, guild }: Play.Input) {
+  playMusic(source: string) {
+    const stream = ytdl(source, {
+      filter: 'audioonly',
+    });
+    const resource = createAudioResource(stream);
+    this.player.play(resource);
+    this.queue.shift();
+  }
+
+  play({ source, channelId, guild }: Play.Input): void {
     const isDisconnected = this.connection?.state.status === 'disconnected';
     if (!this.connection || isDisconnected) {
-      console.log('Join');
       this.join({
         channelId,
         guild,
       });
     }
 
-    const stream = ytdl(audioUrl, {
-      filter: 'audioonly',
-    });
-    const player = createAudioPlayer();
-    const resource = createAudioResource(stream);
+    console.log('added to queue');
 
-    player.play(resource);
+    this.queue.push(source);
 
-    this.connection?.subscribe(player);
+    const playerStatus = this.player.state.status;
+    if (playerStatus !== 'playing') {
+      this.playMusic(source);
+    }
   }
 
-  async leave(): Promise<void> {
+  listQueueSongs(): string {
+    return this.queue.toString();
+  }
+
+  leave(): void {
     if (this.connection) {
       this.connection.disconnect();
+    }
+  }
+
+  pause(): void {
+    this.player.pause();
+  }
+
+  stop(): void {
+    this.queue = [];
+    this.player.stop();
+  }
+
+  resume(): void {
+    this.player.unpause();
+  }
+
+  next(): void {
+    if (this.queue.length) {
+      this.player.stop();
     }
   }
 }
