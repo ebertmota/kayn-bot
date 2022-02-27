@@ -30,4 +30,4 @@ yarn
 yarn dev
 ```
 
-6. Now you can access the bot in your server, use `k.help` in any text channel to see avaialble features.
+6. Now you can access the bot inside your server, use `k.help` in any text channel to see avaialble features.
