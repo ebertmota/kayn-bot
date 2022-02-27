@@ -17,13 +17,13 @@ export default (client: Client): void => {
 
     // eslint-disable-next-line no-unused-vars
     const [prefix, data] = message.content.split(botPrefix);
-    const [commandKey, commandValue] = data.split(' ');
+    const [commandKey, ...commandValue] = data.split(' ');
     const command = commandKey.trim();
 
-    musicListeners({
+    await musicListeners({
       client,
       command,
-      commandValue,
+      commandValue: commandValue.join(' '),
       message,
     });
 

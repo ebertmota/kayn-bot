@@ -17,7 +17,7 @@ type MusicListenersProps = {
   message: Message;
 };
 
-export const musicListeners = ({
+export const musicListeners = async ({
   command,
   commandValue,
   message,
@@ -29,7 +29,7 @@ export const musicListeners = ({
       break;
 
     case 'play':
-      makePlayMusicController().handle({
+      await makePlayMusicController().handle({
         source: commandValue,
         message,
       });

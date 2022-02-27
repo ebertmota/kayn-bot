@@ -6,6 +6,7 @@ import {
   VoiceConnection,
 } from '@discordjs/voice';
 import ytdl from 'ytdl-core';
+import YouTube from 'discord-youtube-api';
 
 import {
   JoinChannel,
@@ -17,6 +18,7 @@ import {
   Next,
   ListQueueSongs,
 } from '@/domain/contracts';
+import { env } from '@/main/config/env';
 
 type AudioHandlerMethods = JoinChannel &
   Play &
@@ -31,9 +33,10 @@ export class AudioHandler implements AudioHandlerMethods {
   private static instance?: AudioHandler;
   private connection: VoiceConnection | null;
   private player: AudioPlayer;
+  private youtube: YouTube;
   private queue: string[] = [];
 
-  constructor() {
+  constructor(private readonly googleApiKey: string) {
     this.connection = null;
     this.player = createAudioPlayer({
       debug: true,
@@ -46,11 +49,13 @@ export class AudioHandler implements AudioHandlerMethods {
         }
       }
     });
+
+    this.youtube = new YouTube(this.googleApiKey);
   }
 
   static getInstance(): AudioHandler {
     if (!AudioHandler.instance) {
-      AudioHandler.instance = new AudioHandler();
+      AudioHandler.instance = new AudioHandler(env.google.apiKey);
     }
 
     return AudioHandler.instance;
@@ -80,7 +85,7 @@ export class AudioHandler implements AudioHandlerMethods {
     this.queue.shift();
   }
 
-  play({ source, channelId, guild }: Play.Input): void {
+  async play({ source, channelId, guild, type }: Play.Input): Promise<void> {
     const isDisconnected = this.connection?.state.status === 'disconnected';
     if (!this.connection || isDisconnected) {
       this.join({
@@ -90,18 +95,28 @@ export class AudioHandler implements AudioHandlerMethods {
     }
 
     console.log('added to queue');
+    let sourceLink = source;
 
-    this.queue.push(source);
+    if (type === 'search') {
+      const songLink = await this.searchInYoutube(source);
+      sourceLink = songLink;
+    }
+
+    this.queue.push(sourceLink);
 
     const playerStatus = this.player.state.status;
     if (playerStatus !== 'playing') {
-      this.playMusic(source);
+      this.playMusic(sourceLink);
     }
   }
 
   listQueueSongs(): string {
-    console.log('ei', this.queue);
     return this.queue.toString();
+  }
+
+  private async searchInYoutube(text: string): Promise<string> {
+    const video = await this.youtube.searchVideos(text);
+    return String(video.url);
   }
 
   leave(): void {

@@ -11,7 +11,7 @@ export interface JoinChannel {
   join(params: JoinChannel.Input): void;
 }
 
-export type SourceType = 'youtube' | 'spotify';
+export type SourceType = 'spotify' | 'youtube' | 'search' | 'unknown';
 
 export namespace Play {
   export type Input = {
@@ -23,7 +23,7 @@ export namespace Play {
 }
 
 export interface Play {
-  play(input: Play.Input): void;
+  play(input: Play.Input): Promise<void>;
 }
 
 export interface ListQueueSongs {
